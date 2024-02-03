@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1a0d3315-151d-4082-b63c-f28a97a7737c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="colour-exibitFlow" doc:id="a5098b67-5b0a-44c3-a72f-231a30a1faa0" >
+		<http:listener doc:name="Listener" doc:id="eff97274-d674-40e6-a2de-223636bdb95c" config-ref="HTTP_Listener_config" path="/color" allowedMethods="PUT,GET"/>
+		<set-payload value="#[payload]" doc:name="payload deaufault Blue" doc:id="1fe0f74e-4ff1-4188-bf15-93e12a58e13d" />
+		<choice doc:name="Payload color" doc:id="2d3268f3-c506-4116-9b8e-3605a04582fa" >
+			<when expression='#[payload contains "red"]'>
+				<set-payload value='#["Blk"]' doc:name="Blk" doc:id="589c5474-5fa0-4b54-98c2-8f34b6d1bb26" />
+			</when>
+			<when expression='#[payload contains "Blk"]'>
+				<set-payload value='#["Green"]' doc:name='"Green"' doc:id="711c20e4-c71d-48b9-917c-5b62b44a2ef2" />
+			</when>
+			<otherwise >
+				<set-payload value="#[payload]" doc:name='"red"' doc:id="ab63bb17-c197-4b2e-80e5-b9e14555ef88" />
+				<flow-ref doc:name="color" doc:id="945be7ea-61bb-4337-8e3a-2ab179f4fb40" name="colour-exibitSub_Flow"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<sub-flow name="colour-exibitSub_Flow" doc:id="1882594b-7846-4df5-ad9c-c3173e7e2a7c" >
+		<set-payload value='#[payload]' doc:name="Set Payload" doc:id="10042664-c334-45db-9a6d-80b84bc59bf3" />
+		<ee:transform doc:name="Transform Message" doc:id="289555de-7a10-44de-8ae6-c1fc3721c575" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
